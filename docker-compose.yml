@@ -1,0 +1,93 @@
+version: '3'
+services:
+
+    redis:
+        image: redis:5.0.8-alpine
+        volumes:
+          - redis-data:/data
+
+    postgres:
+        image: postgres:12.2-alpine
+        env_file:
+            - source/.env
+        ports:
+            - 9433:5432
+        volumes:
+            - .:/shared
+            - db-data:/var/lib/postgresql/data
+
+    webserver:
+        build: .
+        hostname: webserver
+        restart: always
+        depends_on:
+            - postgres
+            - redis
+        env_file:
+            - source/.env
+        volumes:
+            - ./config/airflow.cfg:/root/airflow/airflow.cfg
+            - ./dags:/root/airflow/dags
+            - .:/application/
+            - app-usr-local-bin:/usr/local/bin
+            - app-python-site-packages:/usr/local/lib/python3.7/site-packages
+        ports:
+            - "8081:8080"
+        command: webserver
+
+    flower:
+        build: .
+        hostname: flower
+        restart: always
+        depends_on:
+            - redis
+        volumes:
+            - app-usr-local-bin:/usr/local/bin
+            - app-python-site-packages:/usr/local/lib/python3.7/site-packages
+        env_file:
+            - source/.env
+        ports:
+            - "5555:5555"
+        command: flower
+
+    scheduler:
+        build: .
+        hostname: scheduler
+        restart: always
+        depends_on:
+            - webserver
+        volumes:
+            - ./config/airflow.cfg:/root/airflow/airflow.cfg
+            - ./dags:/root/airflow/dags
+            - .:/application/
+            - app-usr-local-bin:/usr/local/bin
+            - app-python-site-packages:/usr/local/lib/python3.7/site-packages
+        env_file:
+            - source/.env
+        command: scheduler
+
+    worker:
+        build: .
+        hostname: worker
+        restart: always
+        depends_on:
+            - scheduler
+        volumes:
+            - ./config/airflow.cfg:/root/airflow/airflow.cfg
+            - ./dags:/root/airflow/dags
+            - .:/application/
+            - app-usr-local-bin:/usr/local/bin
+            - app-python-site-packages:/usr/local/lib/python3.7/site-packages
+        env_file:
+            - source/.env
+        command: worker
+
+volumes:
+  app-python-site-packages:
+    driver: local
+  db-data:
+    driver: local
+  app-usr-local-bin:
+    driver: local
+  redis-data:
+    driver: local
