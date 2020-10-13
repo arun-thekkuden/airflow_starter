@@ -17,7 +17,7 @@ services:
             - db-data:/var/lib/postgresql/data
 
     webserver:
-        build: .
+        image: airflow-starter:1.10.12
         hostname: webserver
         restart: always
         depends_on:
@@ -36,7 +36,7 @@ services:
         command: webserver
 
     flower:
-        build: .
+        image: airflow-starter:1.10.12
         hostname: flower
         restart: always
         depends_on:
@@ -51,7 +51,7 @@ services:
         command: flower
 
     scheduler:
-        build: .
+        image: airflow-starter:1.10.12
         hostname: scheduler
         restart: always
         depends_on:
@@ -67,7 +67,7 @@ services:
         command: scheduler
 
     worker:
-        build: .
+        image: airflow-starter:1.10.12
         hostname: worker
         restart: always
         depends_on:

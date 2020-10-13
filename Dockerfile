@@ -1,8 +1,10 @@
-# VERSION 1.10.9
-# SOURCE: https://github.com/puckel/docker-airflow
-
 FROM python:3.7-slim-buster
-LABEL maintainer="Maintainer"
+LABEL summary="Basic Airflow container" \
+    name="airflow-starter:1.10.12" \
+    version="1.10.12" \
+    maintainer="Maintainer" \
+    build="docker build -t airflow-starter:1.10.12 ." \
+    source="https://github.com/puckel/docker-airflow"
 
 # Never prompt the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -13,7 +15,7 @@ ENV C_FORCE_ROOT=true
 ENV PYTHONUNBUFFERED 1
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.9
+ARG AIRFLOW_VERSION=1.10.12
 ARG AIRFLOW_USER_HOME=/root/airflow
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
